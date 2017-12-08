@@ -1,0 +1,2 @@
+sanic==0.7.0
+wikipedia==1.4.0
