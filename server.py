@@ -1,8 +1,8 @@
 from sanic import Sanic
 from sanic.response import json
-from scraper import Scraper
+from summarizer import Summarizer
 
-scraper = Scraper()
+summarizer = Summarizer()
 app = Sanic(__name__)
 
 @app.get('/')
@@ -13,11 +13,14 @@ async def root(request):
 async def summarize(request):
     data = request.json
     query = data.get('query', None)
+    type = data.get('type', None)
+    language = data.get('language', None)
+    size = data.get('size', 1)
 
-    intro = scraper.get_intro(query)
+    summary = summarizer.summarize(type=type, query=query, size=int(size))
 
     response = {
-        'summary': intro
+        'summary': summary
     }
 
     return json(response)

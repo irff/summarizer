@@ -72,9 +72,18 @@ class TextRankSummarizer(object):
         selected_sentences = sorted(ranked_sentence_indexes[:size])
         print(selected_sentences)
         summary = itemgetter(*selected_sentences)(sentences)
-        for sentence in summary:
-            print(''.join(sentence))
 
+        if isinstance(summary, tuple):
+            return ' '.join(summary)
 
-summarizer = TextRankSummarizer(language='english')
-summarizer.summarize('naruto', size=2)
+        return summary
+
+class Summarizer():
+    def __init__(self, language='english'):
+        self.text_rank_summarizer = TextRankSummarizer(language)
+
+    def summarize(self, type, query, size):
+        if type == 'text_rank':
+            return self.text_rank_summarizer.summarize(query, size)
+
+        return None
