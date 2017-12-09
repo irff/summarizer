@@ -64,7 +64,8 @@ class TextRankSummarizer(object):
                 similarity_matrix[idx1][idx2] = self.sentence_similarity(sentences[idx1], sentences[idx2])
 
         for idx in range(len(similarity_matrix)):
-            similarity_matrix[idx] /= similarity_matrix[idx].sum()
+            if similarity_matrix[idx].sum() != 0:
+                similarity_matrix[idx] /= similarity_matrix[idx].sum()
 
         return similarity_matrix
 
