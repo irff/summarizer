@@ -12,12 +12,12 @@ async def root(request):
 @app.post('/summarize')
 async def summarize(request):
     data = request.json
-    query = data.get('query', None)
     type = data.get('type', None)
     language = data.get('language', None)
+    query = data.get('query', None)
     size = data.get('size', 1)
 
-    summary = summarizer.summarize(type=type, query=query, size=int(size))
+    summary = summarizer.summarize(type=type, language=language, query=query, size=int(size))
 
     response = {
         'summary': summary

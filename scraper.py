@@ -1,11 +1,20 @@
 import wikipedia
 
+ENGLISH = 'english'
+INDONESIAN = 'indonesian'
+EN = 'en'
+ID = 'id'
+
 class Scraper():
-    def __init__(self):
-        wikipedia.set_lang('en')
-        pass
+    def __init__(self, language):
+        self.language = language
 
     def get(self, query):
+        if self.language == INDONESIAN:
+            wikipedia.set_lang(ID)
+        else:
+            wikipedia.set_lang(EN)
+
         possible_page_titles = wikipedia.search(query)
         if len(possible_page_titles) > 0:
             first_page = possible_page_titles[0]

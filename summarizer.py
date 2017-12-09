@@ -1,17 +1,31 @@
-from operator import itemgetter
-import wikipedia
 import numpy as np
+import nltk
+import os
 from nltk.tokenize import sent_tokenize
 from nltk.corpus import stopwords as sw
 from nltk.cluster.util import cosine_distance
 from nltk.stem.porter import PorterStemmer
+from operator import itemgetter
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from scraper import Scraper
+
+INDONESIAN = 'indonesian'
+ENGLISH = 'english'
 
 
 class TextRankSummarizer(object):
-    def __init__(self, language=None):
+    def __init__(self, language):
+        dir_path = os.path.dirname(os.path.realpath(__file__)) + '/nltk_data/'
+        nltk.data.path = [dir_path]
+
         self.stopwords = sw.words(language)
-        self.stemmer = PorterStemmer()
+        self.scraper = Scraper(language)
+
+        if language == INDONESIAN:
+            factory = StemmerFactory()
+            self.stemmer = factory.create_stemmer()
+        else:
+            self.stemmer = PorterStemmer()
 
     def sentence_similarity(self, sentence1, sentence2):
         if self.stopwords is None:
@@ -63,8 +77,7 @@ class TextRankSummarizer(object):
             probs = new_probs
 
     def summarize(self, query, size=1):
-        scraper = Scraper()
-        text = scraper.get_intro(query)
+        text = self.scraper.get_intro(query)
         sentences = sent_tokenize(text)
         similarity_matrix = self.build_similarity_matrix(sentences)
         sentence_ranks = self.page_rank(similarity_matrix)
@@ -79,11 +92,15 @@ class TextRankSummarizer(object):
         return summary
 
 class Summarizer():
-    def __init__(self, language='english'):
-        self.text_rank_summarizer = TextRankSummarizer(language)
+    def __init__(self):
+        self.english_text_rank_summarizer = TextRankSummarizer(ENGLISH)
+        self.indonesian_text_rank_summarizer = TextRankSummarizer(INDONESIAN)
 
-    def summarize(self, type, query, size):
+    def summarize(self, type, language, query, size):
         if type == 'text_rank':
-            return self.text_rank_summarizer.summarize(query, size)
+            if language == INDONESIAN:
+                return self.indonesian_text_rank_summarizer.summarize(query, size)
+            else:
+                return self.english_text_rank_summarizer.summarize(query, size)
 
         return None
