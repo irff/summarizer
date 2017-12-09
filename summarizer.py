@@ -102,9 +102,18 @@ class Summarizer():
 
     def summarize(self, type, language, query, size):
         if type == TEXT_RANK:
-            if language == INDONESIAN:
-                return self.indonesian_text_rank_summarizer.summarize(query, size)
-            else:
-                return self.english_text_rank_summarizer.summarize(query, size)
+            try:
+                if language == INDONESIAN:
+                    return self.indonesian_text_rank_summarizer.summarize(query, size)
+                else:
+                    return self.english_text_rank_summarizer.summarize(query, size)
+            except:
+                try:
+                    if language == INDONESIAN:
+                        return self.english_text_rank_summarizer.summarize(query, size)
+                    else:
+                        return self.indonesian_text_rank_summarizer.summarize(query, size)
+                except:
+                    return ""
 
         return None
