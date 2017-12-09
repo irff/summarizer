@@ -102,3 +102,7 @@ ENV/
 
 # PyCharm
 .idea/
+
+# Local Settings
+local_settings.py
+Procfile
