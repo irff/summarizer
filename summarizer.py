@@ -1,13 +1,15 @@
 import numpy as np
 import nltk
 import os
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords as sw
 from nltk.cluster.util import cosine_distance
 from nltk.stem.porter import PorterStemmer
 from operator import itemgetter
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from scraper import Scraper
+
+TEXT_RANK = 'text_rank'
 
 INDONESIAN = 'indonesian'
 ENGLISH = 'english'
@@ -31,8 +33,8 @@ class TextRankSummarizer(object):
         if self.stopwords is None:
             self.stopwords = []
 
-        sentence1 = [self.stemmer.stem(w.lower()) for w in sentence1]
-        sentence2 = [self.stemmer.stem(w.lower()) for w in sentence2]
+        sentence1 = [self.stemmer.stem(w.lower()) for w in word_tokenize(sentence1)]
+        sentence2 = [self.stemmer.stem(w.lower()) for w in word_tokenize(sentence2)]
 
         all_words = list(set(sentence1 + sentence2))
 
@@ -91,13 +93,14 @@ class TextRankSummarizer(object):
 
         return summary
 
+
 class Summarizer():
     def __init__(self):
         self.english_text_rank_summarizer = TextRankSummarizer(ENGLISH)
         self.indonesian_text_rank_summarizer = TextRankSummarizer(INDONESIAN)
 
     def summarize(self, type, language, query, size):
-        if type == 'text_rank':
+        if type == TEXT_RANK:
             if language == INDONESIAN:
                 return self.indonesian_text_rank_summarizer.summarize(query, size)
             else:
