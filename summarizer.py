@@ -87,6 +87,9 @@ class TextRankSummarizer(object):
         new_query = " ".join(filtered_words)
         print(new_query)
         text = self.scraper.get_intro(new_query)
+        if not text:
+            print("a")
+            return (-1, new_query)
         sentences = sent_tokenize(text)
         similarity_matrix = self.build_similarity_matrix(sentences)
         sentence_ranks = self.page_rank(similarity_matrix)
@@ -96,9 +99,10 @@ class TextRankSummarizer(object):
         summary = itemgetter(*selected_sentences)(sentences)
 
         if isinstance(summary, tuple):
-            return ' '.join(summary)
-
-        return summary
+            print("b")
+            return (0,' '.join(summary))
+        print("c")
+        return (0, summary)
 
 
 class Summarizer():
@@ -108,18 +112,18 @@ class Summarizer():
 
     def summarize(self, type, language, query, size):
         if type == TEXT_RANK:
-            try:
-                if language == INDONESIAN:
-                    return self.indonesian_text_rank_summarizer.summarize(query, size)
-                else:
-                    return self.english_text_rank_summarizer.summarize(query, size)
-            except:
-                try:
-                    if language == INDONESIAN:
-                        return self.english_text_rank_summarizer.summarize(query, size)
-                    else:
-                        return self.indonesian_text_rank_summarizer.summarize(query, size)
-                except:
-                    return ""
-
+            if language == INDONESIAN:
+                code, result = self.indonesian_text_rank_summarizer.summarize(query, size)
+                if code >= 0: return result
+                print(result)
+                code, result = self.english_text_rank_summarizer.summarize(result, size)
+                if code >= 0: return result
+                return "Saya tidak tahu apa itu " + query
+            else:
+                code, result = self.english_text_rank_summarizer.summarize(query, size)
+                if code >= 0: return result
+                print(result)
+                code, result = self.indonesian_text_rank_summarizer.summarize(result, size)
+                if code >= 0: return result
+                return "I don't understand what is " + query
         return None
