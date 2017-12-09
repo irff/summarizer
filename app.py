@@ -72,7 +72,7 @@ def handle_text_message(event):
         reply(event,random.randint(0,int(cmd[1])))
     elif '?' in text:
         language = 'english' if translator.detect(text) == 'en' else 'indonesian'
-        reply(event, summarizer.summarize(type='text_rank', language=language, query=text, size=2))
+        reply(event, str(summarizer.summarize(type='text_rank', language=language, query=text, size=2)))
 
 
 if __name__ == "__main__":
