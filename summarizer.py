@@ -80,8 +80,8 @@ class TextRankSummarizer(object):
             probs = new_probs
 
     def summarize(self, query, size=1):
-        words = word_tokenize(query)
-        filtered_words = [word for word in words.lower() if word not in self.stopwords and word.isalpha()]
+        words = word_tokenize(query.lower())
+        filtered_words = [word for word in words if word not in self.stopwords and word.isalpha()]
         new_query = " ".join(filtered_words)
         print(new_query)
         text = self.scraper.get_intro(new_query)
