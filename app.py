@@ -71,7 +71,7 @@ def handle_text_message(event):
     if cmd[0] == '/check' and len(cmd) > 1:
         reply(event,random.randint(0,int(cmd[1])))
     elif '?' in text:
-        language = 'indonesian' if translator.detect(text) == 'id' else 'english'
+        language = 'english' if translator.detect(text) == 'en' else 'indonesian'
         reply(event, summarizer.summarize(type='text_rank', language=language, query=text, size=2))
 
 
