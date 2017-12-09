@@ -3,7 +3,7 @@ import errno
 import os
 import sys
 from googletrans import Translator
-from local_settings import CHANNEL_SECRET, CHANNEL_ACCESS_TOKEN
+from settings import CHANNEL_SECRET, CHANNEL_ACCESS_TOKEN
 from argparse import ArgumentParser
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
