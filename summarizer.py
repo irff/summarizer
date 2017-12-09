@@ -80,6 +80,8 @@ class TextRankSummarizer(object):
             probs = new_probs
 
     def summarize(self, query, size=1):
+        for ch in ['&',':','-','+','.',',']:
+            query = query.replace(ch,' ')
         words = word_tokenize(query.lower())
         filtered_words = [word for word in words if word not in self.stopwords and word.isalpha()]
         new_query = " ".join(filtered_words)
