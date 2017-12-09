@@ -24,7 +24,7 @@ app = Flask(__name__)
 
 line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(CHANNEL_SECRET)
-
+summarizer = Summarizer()
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 translator = Translator()
 
