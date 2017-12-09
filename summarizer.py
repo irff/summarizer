@@ -80,13 +80,17 @@ class TextRankSummarizer(object):
             probs = new_probs
 
     def summarize(self, query, size=1):
-        text = self.scraper.get_intro(query)
+        words = word_tokenize(query)
+        filtered_words = [word for word in words if word not in self.stopwords and word.isalpha()]
+        new_query = " ".join(filtered_words)
+        print(new_query)
+        text = self.scraper.get_intro(new_query)
         sentences = sent_tokenize(text)
         similarity_matrix = self.build_similarity_matrix(sentences)
         sentence_ranks = self.page_rank(similarity_matrix)
         ranked_sentence_indexes = [item[0] for item in sorted(enumerate(sentence_ranks), key=lambda item: -item[1])]
         selected_sentences = sorted(ranked_sentence_indexes[:size])
-        print(selected_sentences)
+
         summary = itemgetter(*selected_sentences)(sentences)
 
         if isinstance(summary, tuple):
