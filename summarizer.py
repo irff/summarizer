@@ -1,6 +1,7 @@
 import numpy as np
 import nltk
 import os
+import re
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords as sw
 from nltk.cluster.util import cosine_distance
@@ -93,6 +94,10 @@ class TextRankSummarizer(object):
             suggested_query, status, lang = self.scraper.get_query(new_query)
 
         text = self.scraper.get_intro_lang(suggested_query, lang)
+
+        # remove formula notation and multiple spaces
+        text = re.sub('{.+}', '', text)
+        text = re.sub('\s+', ' ', text)
 
         if not text:
             if self.language == INDONESIAN:
