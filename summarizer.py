@@ -86,11 +86,11 @@ class TextRankSummarizer(object):
         filtered_words = [word for word in words if word not in self.stopwords and word.isalpha()]
         new_query = " ".join(filtered_words)
 
-        suggested_query, status, lang = self.scraper.get_query(query)
+        suggested_query, status, lang = self.scraper.get_query(new_query)
         if status == -1:
-            suggested_query, status, lang = self.scraper.get_query(query,isInverse=True)
+            suggested_query, status, lang = self.scraper.get_query(new_query,isInverse=True)
         if status == -1:
-            suggested_query, status, lang = self.scraper.get_query(query)
+            suggested_query, status, lang = self.scraper.get_query(new_query)
 
         text = self.scraper.get_intro_lang(suggested_query, lang)
 
