@@ -59,7 +59,7 @@ class Scraper():
                 return possible_page_titles[0], 0, lang
             else:
                 suggested_query = wikipedia.suggest(query)
-                if len(suggested_query) < 1:
+                if suggested_query is None or len(suggested_query) < 1:
                     return [], -1, lang
                 possible_page_titles = wikipedia.search(suggested_query)
 
