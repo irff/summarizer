@@ -69,7 +69,7 @@ def handle_text_message(event):
     print(event.as_json_string())
     flag = False
     for ch in ['apa', 'ap', 'siapa', 'what', 'who', 'siapakah']:
-        flag |= ch in text
+        flag |= ch in text.lower()
 
     if cmd[0] == '/check' and len(cmd) > 1:
         reply(event,random.randint(0,int(cmd[1])))

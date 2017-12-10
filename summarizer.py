@@ -113,7 +113,7 @@ class Summarizer():
             if language == INDONESIAN:
                 print("in")
                 code, result = self.indonesian_text_rank_summarizer.summarize(query, size)
-                if code >= 0: return result
+                    if code >= 0: return result
                 print(result)
                 code, result = self.english_text_rank_summarizer.summarize(result, size)
                 if code >= 0: return result
