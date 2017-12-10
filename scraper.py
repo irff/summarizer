@@ -68,7 +68,7 @@ class Scraper():
 
         except wikipedia.exceptions.DisambiguationError as e:
             possible_page_titles = e.options
-            return possible_page_titles[0], -1, lang
+            return possible_page_titles[0], 0, lang
 
         return [], -1, lang
 
