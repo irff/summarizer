@@ -69,16 +69,21 @@ class Scraper():
         except wikipedia.exceptions.DisambiguationError as e:
             possible_page_titles = e.options
             return possible_page_titles[0], 0, lang
+        else:
+            return possible_page_titles[0], 0, lang
 
         return [], -1, lang
-
     def get_intro_lang(self, query, lang):
         if lang == INDONESIAN:
             wikipedia.set_lang(ID)
         else:
             wikipedia.set_lang(EN)
-        content = self.get_first_page([query])
-
+        try:
+            content = self.get_first_page([query])
+        except wikipedia.exceptions.DisambiguationError as e:
+            possible_page_titles = e.options
+            content = self.get_first_page(possible_page_titles)
+            
         if content is not None:
             intro = content.split('==', 1)[0]
             if intro is not None:
