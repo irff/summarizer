@@ -9,6 +9,8 @@ from nltk.stem.porter import PorterStemmer
 from operator import itemgetter
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from scraper import Scraper
+from scipy.sparse.linalg import svds
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 TEXT_RANK = 'text_rank'
 
@@ -84,7 +86,7 @@ class TextRankSummarizer(object):
         for ch in ['&',':','-','+','.',',']:
             query = query.replace(ch,' ')
         words = word_tokenize(query.lower())
-        filtered_words = [word for word in words if word not in self.stopwords and word.isalpha()]
+        filtered_words = [word for word in words if word not in self.stopwords and word.isalnum()]
         new_query = " ".join(filtered_words)
         print("new query : " + new_query)
         suggested_query, status, lang = self.scraper.get_query(new_query)
@@ -131,19 +133,135 @@ class TextRankSummarizer(object):
             if lang == INDONESIAN:
                 return "mungkin maksud anda adalah {sq}\n{s}".format(sq=suggested_query, s=summary)
             else:
-                return "maybe this is what you want {sq}\n{s}".format(sq=suggested_query, s=res)
+                return "maybe this is what you want {sq}\n{s}".format(sq=suggested_query, s=summary)
+        else:
+            return summary
+
+class LSASumarizer():
+    def __init__(self, language):
+        dir_path = os.path.dirname(os.path.realpath(__file__)) + '/nltk_data/'
+        nltk.data.path = [dir_path]
+
+        self.stopwords = sw.words(language)
+        if self.stopwords is None:
+            self.stopwords = []
+        self.scraper = Scraper(language)
+        self.language = language
+        if language == INDONESIAN:
+            factory = StemmerFactory()
+            self.stemmer = factory.create_stemmer()
+        else:
+            self.stemmer = PorterStemmer()
+
+    def _build_feature_matrix(self, documents, feature_type='frequency'):
+
+        def _tokenize(sentence):
+            return [self.stemmer.stem(w.lower()) for w in word_tokenize(sentence)]
+
+        feature_type = feature_type.lower().strip()
+
+        if feature_type == 'binary':
+            vectorizer = CountVectorizer(binary=True,
+                                         min_df=1,
+                                         stop_words=self.stopwords,
+                                         tokenizer=_tokenize,
+                                         ngram_range=(1, 2))
+        elif feature_type == 'frequency':
+            vectorizer = CountVectorizer(binary=False,
+                                         min_df=1,
+                                         analyzer= 'word',
+                                         stop_words=self.stopwords,
+                                         tokenizer=_tokenize,
+                                         ngram_range=(1, 2))
+        elif feature_type == 'tfidf':
+            vectorizer = TfidfVectorizer(min_df=1,
+                                         stop_words=self.stopwords,
+                                         tokenizer=_tokenize,
+                                         ngram_range=(1, 2))
+        else:
+            raise Exception("Wrong feature type entered. Possible values: 'binary', 'frequency', 'tfidf'")
+
+        feature_matrix = vectorizer.fit_transform(documents).astype(float)
+
+        return vectorizer, feature_matrix
+
+    def _low_rank_svd(self, matrix, singular_count=2):
+        u, s, vt = svds(matrix, k=singular_count)
+        return u, s, vt
+
+    def _summarize(self, document, num_sentences=2,
+                            num_topics=1, feature_type='frequency',
+                            sv_threshold=0.5):
+        sentences = sent_tokenize(document)
+        vec, dt_matrix = self._build_feature_matrix(sentences,
+                                              feature_type=feature_type)
+
+        td_matrix = dt_matrix.transpose()
+        td_matrix = td_matrix.multiply(td_matrix > 0)
+
+        u, s, vt = self._low_rank_svd(td_matrix, singular_count=num_topics)
+        min_sigma_value = max(s) * sv_threshold
+        s[s < min_sigma_value] = 0
+
+        salience_scores = np.sqrt(np.dot(np.square(s), np.square(vt)))
+        top_sentence_indices = salience_scores.argsort()[-num_sentences:][::-1]
+        top_sentence_indices.sort()
+
+        result = ""
+        for index in top_sentence_indices:
+            result += sentences[index]
+
+        return result
+
+    def summarize(self, query, size=2):
+        for ch in ['&',':','-','+','.',',']:
+            query = query.replace(ch,' ')
+        query = re.sub('[^ 0-9a-zA-Z]+', '', query)
+        words = word_tokenize(query.lower())
+        filtered_words = [word for word in words if word not in self.stopwords and word.isalnum()]
+        new_query = " ".join(filtered_words)
+        print("new query : " + new_query)
+        suggested_query, status, lang = self.scraper.get_query(new_query)
+        if status == -1:
+            suggested_query, status, lang = self.scraper.get_query(new_query,isInverse=True)
+        if status == -1:
+            suggested_query, status, lang = self.scraper.get_query(new_query)
+
+        text = self.scraper.get_intro_lang(suggested_query, lang)
+
+        # remove formula notation and multiple spaces
+        text = re.sub('{.+}', '', text)
+        text = re.sub('\s+', ' ', text)
+
+        if not text:
+            if self.language == INDONESIAN:
+                return "mohon maaf {q} tidak ditemukan".format(q=query)
+            else:
+                return "{q} not found".format(q=query)
+
+        summary = self._summarize(text, size)
+
+        if status == 0:
+            return summary
+        elif lang == self.language:
+            if lang == INDONESIAN:
+                return "mungkin maksud anda adalah {sq}\n{s}".format(sq=suggested_query, s=summary)
+            else:
+                return "maybe this is what you want {sq}\n{s}".format(sq=suggested_query, s=summary)
         else:
             return summary
 
 class Summarizer():
-    def __init__(self):
-        self.english_text_rank_summarizer = TextRankSummarizer(ENGLISH)
-        self.indonesian_text_rank_summarizer = TextRankSummarizer(INDONESIAN)
+    def __init__(self, method=TEXT_RANK):
+        if method == TEXT_RANK:
+            self.english_summarizer = TextRankSummarizer(ENGLISH)
+            self.indonesian_summarizer = TextRankSummarizer(INDONESIAN)
+        else:
+            self.english_summarizer = LSASumarizer(ENGLISH)
+            self.indonesian_summarizer = LSASumarizer(INDONESIAN)
 
-    def summarize(self, type, language, query, size):
-        if type == TEXT_RANK:
-            if language == INDONESIAN:
-                return self.indonesian_text_rank_summarizer.summarize(query, size)
-            else:
-                return self.english_text_rank_summarizer.summarize(query, size)
-        return None
+    def summarize(self, language, query, size):
+        if language == INDONESIAN:
+            return self.indonesian_summarizer.summarize(query, size)
+        else:
+            return self.english_summarizer.summarize(query, size)

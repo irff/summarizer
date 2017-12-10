@@ -77,7 +77,7 @@ def handle_text_message(event):
         print("ini detectednya :" + str(translator.detect(text).lang))
         language = 'indonesian' if (translator.detect(text).lang == 'id' or translator.detect(text).lang == 'msid' or translator.detect(text).lang == 'idms') else 'english'
         print(language)
-        reply(event, str(summarizer.summarize(type='text_rank', language=language, query=text, size=2)))
+        reply(event, str(summarizer.summarize(language=language, query=text, size=2)))
 
 
 if __name__ == "__main__":
