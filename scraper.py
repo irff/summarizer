@@ -83,10 +83,10 @@ class Scraper():
         except wikipedia.exceptions.DisambiguationError as e:
             possible_page_titles = e.options
             content = self.get_first_page(possible_page_titles)
-            
+
         if content is not None:
             intro = content.split('==', 1)[0]
             if intro is not None:
-                return intro.rstrip('\n\r')
+                return intro.rstrip('\n\r\s')
 
         return None
