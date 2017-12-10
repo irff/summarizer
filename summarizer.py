@@ -262,6 +262,12 @@ class Summarizer():
 
     def summarize(self, language, query, size):
         if language == INDONESIAN:
-            return self.indonesian_summarizer.summarize(query, size)
+            try:
+                return self.indonesian_summarizer.summarize(query, size)
+            except:
+                return "saya tidak paham maksud anda :("
         else:
-            return self.english_summarizer.summarize(query, size)
+            try:
+                return self.english_summarizer.summarize(query, size)
+            except:
+                return "I can't understand :("

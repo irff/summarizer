@@ -55,7 +55,7 @@ class Scraper():
             lang = ENGLISH
         try:
             possible_page_titles = wikipedia.search(query)
-            if len(possible_page_titles) > 0:
+            if possible_page_titles and len(possible_page_titles) > 0:
                 return possible_page_titles[0], 0, lang
             else:
                 suggested_query = wikipedia.suggest(query)
@@ -63,14 +63,18 @@ class Scraper():
                     return [], -1, lang
                 possible_page_titles = wikipedia.search(suggested_query)
 
-                if len(possible_page_titles) > 0:
+                if possible_page_titles and len(possible_page_titles) > 0:
                     return possible_page_titles[0], -1, lang
 
         except wikipedia.exceptions.DisambiguationError as e:
             possible_page_titles = e.options
-            return possible_page_titles[0], 0, lang
+            if possible_page_titles and len(possible_page_titles) > 0:
+                return possible_page_titles[0], 0, lang
+            return [], -1, lang
         else:
-            return possible_page_titles[0], 0, lang
+            if possible_page_titles and len(possible_page_titles) > 0:
+                return possible_page_titles[0], 0, lang
+            return [], -1, lang
 
         return [], -1, lang
     def get_intro_lang(self, query, lang):
