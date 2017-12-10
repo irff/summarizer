@@ -85,10 +85,8 @@ class TextRankSummarizer(object):
         words = word_tokenize(query.lower())
         filtered_words = [word for word in words if word not in self.stopwords and word.isalpha()]
         new_query = " ".join(filtered_words)
-        print(new_query)
         text = self.scraper.get_intro(new_query)
         if not text:
-            print("a")
             return (-1, new_query)
         sentences = sent_tokenize(text)
         similarity_matrix = self.build_similarity_matrix(sentences)
@@ -113,17 +111,19 @@ class Summarizer():
     def summarize(self, type, language, query, size):
         if type == TEXT_RANK:
             if language == INDONESIAN:
+                print("in")
                 code, result = self.indonesian_text_rank_summarizer.summarize(query, size)
                 if code >= 0: return result
                 print(result)
                 code, result = self.english_text_rank_summarizer.summarize(result, size)
                 if code >= 0: return result
-                return "Saya tidak tahu apa itu " + query
+                return "Saya tidak dapat menemukan " + query
             else:
+                print("en")
                 code, result = self.english_text_rank_summarizer.summarize(query, size)
                 if code >= 0: return result
                 print(result)
                 code, result = self.indonesian_text_rank_summarizer.summarize(result, size)
                 if code >= 0: return result
-                return "I don't understand what is " + query
+                return "I can't find what is " + query
         return None
