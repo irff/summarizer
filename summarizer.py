@@ -22,7 +22,7 @@ class TextRankSummarizer(object):
 
         self.stopwords = sw.words(language)
         self.scraper = Scraper(language)
-
+        self.language = language
         if language == INDONESIAN:
             factory = StemmerFactory()
             self.stemmer = factory.create_stemmer()
@@ -85,9 +85,21 @@ class TextRankSummarizer(object):
         words = word_tokenize(query.lower())
         filtered_words = [word for word in words if word not in self.stopwords and word.isalpha()]
         new_query = " ".join(filtered_words)
-        text = self.scraper.get_intro(new_query)
+
+        suggested_query, status, lang = self.scraper.get_query(query)
+        if status == -1:
+            suggested_query, status, lang = self.scraper.get_query(query,isInverse=True)
+        if status == -1:
+            suggested_query, status, lang = self.scraper.get_query(query)
+
+        text = self.scraper.get_intro_lang(suggested_query, lang)
+
         if not text:
-            return (-1, new_query)
+            if self.language == INDONESIAN:
+                return "mohon maaf {q} tidak ditemukan".format(q=query)
+            else:
+                return "{q} not found".format(q=query)
+
         sentences = sent_tokenize(text)
         similarity_matrix = self.build_similarity_matrix(sentences)
         sentence_ranks = self.page_rank(similarity_matrix)
@@ -97,11 +109,26 @@ class TextRankSummarizer(object):
         summary = itemgetter(*selected_sentences)(sentences)
 
         if isinstance(summary, tuple):
-            print("b")
-            return (0,' '.join(summary))
-        print("c")
-        return (0, summary)
+            if status == 0:
+                return ' '.join(summary)
+            elif lang == self.language:
+                res = ' '.join(summary)
+                if lang == INDONESIAN:
+                    return "mungkin maksud anda adalah {sq}\n{s}".format(sq=suggested_query, s=res)
+                else:
+                    return "maybe this is what you want {sq}\n{s}".format(sq=suggested_query, s=res)
+            else:
+                return summary
 
+        if status == 0:
+            return summary
+        elif lang == self.language:
+            if lang == INDONESIAN:
+                return "mungkin maksud anda adalah {sq}\n{s}".format(sq=suggested_query, s=summary)
+            else:
+                return "maybe this is what you want {sq}\n{s}".format(sq=suggested_query, s=res)
+        else:
+            return summary
 
 class Summarizer():
     def __init__(self):
@@ -111,19 +138,7 @@ class Summarizer():
     def summarize(self, type, language, query, size):
         if type == TEXT_RANK:
             if language == INDONESIAN:
-                print("in")
-                code, result = self.indonesian_text_rank_summarizer.summarize(query, size)
-                if code >= 0: return result
-                print(result)
-                code, result = self.english_text_rank_summarizer.summarize(result, size)
-                if code >= 0: return result
-                return "Saya tidak dapat menemukan " + query
+                return self.indonesian_text_rank_summarizer.summarize(query, size)
             else:
-                print("en")
-                code, result = self.english_text_rank_summarizer.summarize(query, size)
-                if code >= 0: return result
-                print(result)
-                code, result = self.indonesian_text_rank_summarizer.summarize(result, size)
-                if code >= 0: return result
-                return "I can't find what is " + query
+                return self.english_text_rank_summarizer.summarize(query, size)
         return None

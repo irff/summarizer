@@ -45,3 +45,43 @@ class Scraper():
                 return intro.rstrip('\n\r')
 
         return None
+
+    def get_query(self, query, isInverse=False):
+        if self.language == INDONESIAN and not isInverse:
+            wikipedia.set_lang(ID)
+            lang = INDONESIAN
+        else:
+            wikipedia.set_lang(EN)
+            lang = ENGLISH
+        try:
+            possible_page_titles = wikipedia.search(query)
+            if len(possible_page_titles) > 0:
+                return possible_page_titles[0], 0, lang
+            else:
+                suggested_query = wikipedia.suggest(query)
+                if len(suggested_query) < 1:
+                    return [], -1, lang
+                possible_page_titles = wikipedia.search(suggested_query)
+
+                if len(possible_page_titles) > 0:
+                    return possible_page_titles[0], -1, lang
+
+        except wikipedia.exceptions.DisambiguationError as e:
+            possible_page_titles = e.options
+            return possible_page_titles, -1, lang
+
+        return [], -1, lang
+
+    def get_intro_lang(self, query, lang):
+        if lang == INDONESIAN:
+            wikipedia.set_lang(ID)
+        else:
+            wikipedia.set_lang(EN)
+        content = self.get_first_page([query])
+
+        if content is not None:
+            intro = content.split('==', 1)[0]
+            if intro is not None:
+                return intro.rstrip('\n\r')
+
+        return None
