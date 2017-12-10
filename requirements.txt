@@ -15,12 +15,12 @@ MarkupSafe==1.0
 nltk==3.2.5
 numpy==1.13.3
 requests==2.18.4
-sanic==0.7.0
 Sastrawi==1.0.1
 six==1.11.0
 ujson==1.35
 urllib3==1.22
-uvloop==0.9.1
 websockets==4.0.1
 Werkzeug==0.13
 wikipedia==1.4.0
+scipy
+sklearn
