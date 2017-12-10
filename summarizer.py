@@ -143,7 +143,13 @@ class Summarizer():
     def summarize(self, type, language, query, size):
         if type == TEXT_RANK:
             if language == INDONESIAN:
-                return self.indonesian_text_rank_summarizer.summarize(query, size)
+                try:
+                    return self.indonesian_text_rank_summarizer.summarize(query, size)
+                except:
+                    return "saya tidak paham maksud anda :("
             else:
-                return self.english_text_rank_summarizer.summarize(query, size)
+                try:
+                    return self.english_text_rank_summarizer.summarize(query, size)
+                except:
+                    return "I can't understand :("
         return None
