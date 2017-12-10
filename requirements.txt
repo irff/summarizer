@@ -24,3 +24,5 @@ Werkzeug==0.13
 wikipedia==1.4.0
 scipy
 sklearn
+# uvloop==0.9.1
+# sanic==0.7.0
