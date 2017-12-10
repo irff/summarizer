@@ -67,10 +67,13 @@ def handle_text_message(event):
     text = event.message.text
     cmd = text.split()
     print(event.as_json_string())
+    flag = False
+    for ch in ['apa', 'ap', 'siapa', 'what', 'who', 'siapakah']:
+        flag |= ch in text
 
     if cmd[0] == '/check' and len(cmd) > 1:
         reply(event,random.randint(0,int(cmd[1])))
-    elif '?' in text and ['apa', 'ap', 'siapa', 'what', 'who', 'siapakah'] in text:
+    elif '?' in text and flag:
         language = 'indonesian' if translator.detect(text) == 'id' else 'english'
         reply(event, str(summarizer.summarize(type='text_rank', language=language, query=text, size=2)))
 
