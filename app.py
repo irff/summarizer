@@ -69,7 +69,7 @@ def handle_text_message(event):
     print(event.as_json_string())
     flag = False
     for ch in ['apa', 'ap', 'siapa', 'what', 'who', 'siapakah']:
-        flag |= ch in text.lower()
+        flag |= text.lower().startswith(ch)
 
     if cmd[0] == '/check' and len(cmd) > 1:
         reply(event,random.randint(0,int(cmd[1])))
@@ -77,7 +77,7 @@ def handle_text_message(event):
         print("ini detectednya :" + str(translator.detect(text).lang))
         language = 'indonesian' if (translator.detect(text).lang == 'id' or translator.detect(text).lang == 'msid' or translator.detect(text).lang == 'idms') else 'english'
         print(language)
-        reply(event, str(summarizer.summarize(type='text_rank', language=language, query=text, size=2)))
+        reply(event, str(summarizer.summarize(language=language, query=text, size=2)))
 
 
 if __name__ == "__main__":
@@ -94,4 +94,4 @@ if __name__ == "__main__":
     # app.run(debug=options.debug, port=options.port)
 
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0')
