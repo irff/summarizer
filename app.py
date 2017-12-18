@@ -73,7 +73,7 @@ def handle_text_message(event):
 
     if cmd[0] == '/check' and len(cmd) > 1:
         reply(event,random.randint(0,int(cmd[1])))
-    elif '?' in text and flag and text.startswith('mbok,'):
+    elif '?' in text and flag and text.lower().startswith('mbok,'):
         text = text.split(',', 1)[1]
         language = 'indonesian' if (translator.detect(text).lang == 'id' or translator.detect(text).lang == 'msid' or translator.detect(text).lang == 'idms') else 'english'
         reply(event, str(summarizer.summarize(language=language, query=text, size=2)))
