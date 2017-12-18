@@ -20,7 +20,7 @@ def cosine_sim(text1, text2):
 
 
 myList = []
-with open('news_summary.csv') as csvfile:
+with open('news_summary.csv','r',encoding='utf-8', errors='ignore') as csvfile:
     reader = csv.DictReader(csvfile)
     try:
         for row in reader:
@@ -29,7 +29,11 @@ with open('news_summary.csv') as csvfile:
             except:
                 continue
     except:
-        pass
+        for row in reader:
+            try:
+                myList.append({'text':row['text'],'ctext':row['ctext']})
+            except:
+                continue
 
 
 text_rank_summarizer = Summarizer()
