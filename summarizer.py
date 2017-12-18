@@ -92,7 +92,7 @@ class TextRankSummarizer(object):
             words = word_tokenize(query.lower())
             filtered_words = [word for word in words if word not in self.stopwords and word.isalnum()]
             new_query = " ".join(filtered_words)
-            #print("new query : " + new_query)
+
             suggested_query, status, lang = self.scraper.get_query(new_query)
             if status == -1:
                 suggested_query, status, lang = self.scraper.get_query(new_query,isInverse=True)
@@ -100,7 +100,7 @@ class TextRankSummarizer(object):
                 suggested_query, status, lang = self.scraper.get_query(new_query)
 
         text = text if text else self.scraper.get_intro_lang(suggested_query, lang)
-        print(str(text))
+
         # remove formula notation and multiple spaces
         text = re.sub('{.+}', '', text)
         text = re.sub('\s+', ' ', text)
@@ -228,7 +228,7 @@ class LSASumarizer():
             words = word_tokenize(query.lower())
             filtered_words = [word for word in words if word not in self.stopwords and word.isalnum()]
             new_query = " ".join(filtered_words)
-            print("new query : " + new_query)
+
             suggested_query, status, lang = self.scraper.get_query(new_query)
             if status == -1:
                 suggested_query, status, lang = self.scraper.get_query(new_query,isInverse=True)
