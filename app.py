@@ -66,7 +66,7 @@ def reply(event, message):
 def handle_text_message(event):
     text = event.message.text
     cmd = text.split()
-    print(event.as_json_string())
+#    print(event.as_json_string())
     flag = False
     for ch in ['apa', 'ap', 'siapa', 'what', 'who', 'siapakah']:
         flag |= ch in text.lower()
