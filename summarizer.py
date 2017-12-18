@@ -82,20 +82,24 @@ class TextRankSummarizer(object):
                 return new_probs
             probs = new_probs
 
-    def summarize(self, query, size=1):
-        for ch in ['&',':','-','+','.',',']:
-            query = query.replace(ch,' ')
-        words = word_tokenize(query.lower())
-        filtered_words = [word for word in words if word not in self.stopwords and word.isalnum()]
-        new_query = " ".join(filtered_words)
-        print("new query : " + new_query)
-        suggested_query, status, lang = self.scraper.get_query(new_query)
-        if status == -1:
-            suggested_query, status, lang = self.scraper.get_query(new_query,isInverse=True)
-        if status == -1:
+    def summarize(self, query=None, size=1, text=None):
+        suggested_query = None
+        lang = None
+        status = 0
+        if query:
+            for ch in ['&',':','-','+','.',',']:
+                query = query.replace(ch,' ')
+            words = word_tokenize(query.lower())
+            filtered_words = [word for word in words if word not in self.stopwords and word.isalnum()]
+            new_query = " ".join(filtered_words)
+            print("new query : " + new_query)
             suggested_query, status, lang = self.scraper.get_query(new_query)
+            if status == -1:
+                suggested_query, status, lang = self.scraper.get_query(new_query,isInverse=True)
+            if status == -1:
+                suggested_query, status, lang = self.scraper.get_query(new_query)
 
-        text = self.scraper.get_intro_lang(suggested_query, lang)
+        text = text if text else self.scraper.get_intro_lang(suggested_query, lang)
 
         # remove formula notation and multiple spaces
         text = re.sub('{.+}', '', text)
@@ -213,21 +217,25 @@ class LSASumarizer():
 
         return result
 
-    def summarize(self, query, size=2):
-        for ch in ['&',':','-','+','.',',']:
-            query = query.replace(ch,' ')
-        query = re.sub('[^ 0-9a-zA-Z]+', '', query)
-        words = word_tokenize(query.lower())
-        filtered_words = [word for word in words if word not in self.stopwords and word.isalnum()]
-        new_query = " ".join(filtered_words)
-        print("new query : " + new_query)
-        suggested_query, status, lang = self.scraper.get_query(new_query)
-        if status == -1:
-            suggested_query, status, lang = self.scraper.get_query(new_query,isInverse=True)
-        if status == -1:
+    def summarize(self, query=None, size=2, text=None):
+        suggested_query = None
+        lang = None
+        status = 0
+        if query:
+            for ch in ['&',':','-','+','.',',']:
+                query = query.replace(ch,' ')
+            query = re.sub('[^ 0-9a-zA-Z]+', '', query)
+            words = word_tokenize(query.lower())
+            filtered_words = [word for word in words if word not in self.stopwords and word.isalnum()]
+            new_query = " ".join(filtered_words)
+            print("new query : " + new_query)
             suggested_query, status, lang = self.scraper.get_query(new_query)
+            if status == -1:
+                suggested_query, status, lang = self.scraper.get_query(new_query,isInverse=True)
+            if status == -1:
+                suggested_query, status, lang = self.scraper.get_query(new_query)
 
-        text = self.scraper.get_intro_lang(suggested_query, lang)
+        text = text if text else self.scraper.get_intro_lang(suggested_query, lang)
 
         # remove formula notation and multiple spaces
         text = re.sub('{.+}', '', text)
@@ -260,14 +268,14 @@ class Summarizer():
             self.english_summarizer = LSASumarizer(ENGLISH)
             self.indonesian_summarizer = LSASumarizer(INDONESIAN)
 
-    def summarize(self, language, query, size):
+    def summarize(self, language, size, query=None, text=None):
         if language == INDONESIAN:
-            try:
-                return self.indonesian_summarizer.summarize(query, size)
-            except:
-                return "saya tidak paham maksud anda :("
+            # try:
+            return self.indonesian_summarizer.summarize(query, size, text)
+            # except:
+                # return "saya tidak paham maksud anda :("
         else:
-            try:
-                return self.english_summarizer.summarize(query, size)
-            except:
-                return "I can't understand :("
+            # try:
+            return self.english_summarizer.summarize(query, size, text)
+            # except:
+                # return "I can't understand :("
