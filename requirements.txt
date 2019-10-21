@@ -21,7 +21,7 @@ jsonpointer==1.9
 language-selector==0.1
 line-bot-sdk==1.5.0
 MarkupSafe==1.0
-nltk==3.2.5
+nltk==3.4.5
 numpy==1.13.3
 oauthlib==1.0.3
 prettytable==0.7.2
