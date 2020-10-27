@@ -7,7 +7,7 @@ click==6.7
 cloud-init==17.1
 command-not-found==0.3
 configobj==5.0.6
-cryptography==1.2.3
+cryptography==3.2
 Flask==0.12.2
 future==0.16.0
 googletrans==2.2.0
