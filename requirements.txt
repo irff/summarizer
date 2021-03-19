@@ -15,7 +15,7 @@ gunicorn==19.7.1
 httptools==0.0.9
 idna==2.6
 itsdangerous==0.24
-Jinja2==2.10
+Jinja2==2.11.3
 jsonpatch==1.10
 jsonpointer==1.9
 language-selector==0.1
