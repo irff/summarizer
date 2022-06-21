@@ -22,7 +22,7 @@ language-selector==0.1
 line-bot-sdk==1.5.0
 MarkupSafe==1.0
 nltk==3.2.5
-numpy==1.13.3
+numpy==1.22.0
 oauthlib==1.0.3
 prettytable==0.7.2
 pyasn1==0.1.9
