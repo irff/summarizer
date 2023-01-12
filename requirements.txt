@@ -42,7 +42,7 @@ six==1.11.0
 sklearn==0.0
 ssh-import-id==5.5
 ufw==0.35
-ujson==1.35
+ujson==5.4.0
 unattended-upgrades==0.1
 urllib3==1.22
 virtualenv==15.1.0
